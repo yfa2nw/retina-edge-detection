@@ -74,6 +74,8 @@ Finally, we will look at how our edge detection circuitry can also give us illus
 
 Usually, I would contain some problem sets for practice but I'm swarmed with other work. Maybe I'll update this project in the future to have it contain some problems.
 
+There's a Jupyter Notebook file in this project as well. I used that as my thought process to streamline the calculations of cell activity. The code is... not updated when I debugged in the JavaScript version later, but it's a nice template if anyone is interested. I would most likely use this file to expand the calculations to include color perception, if I have time.
+
 Also, as mentioned in the webpage itself, this GitHub project is actually a side project I decided to dive into. It is designed to be a supplementary material for Project MEEP - pre-Medical Electronic Education Platform - a website dedicated to create high-quality, accessible, practice-heavy education materials for aspiring medical students.
 
 As of 2025, the website is still heavily under construction (the bugs keep coming), but do visit! it's https://yfmeep.com
