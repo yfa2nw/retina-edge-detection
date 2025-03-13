@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Retinal Ganglion Cell Simulation</title>
+        <link rel="stylesheet" href="retina.css">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+
+        <!-- Website title and tutorial icon -->
+        <div class="website-title">
+            <h1 style="text-align: center">The Retina - Edge Detection</h1>
+            <a href="#nav-menu-divider" style="text-decoration: none; color: #333;"><div class="help-icon">?</div></a>
+        </div>
+
+        <!-- Simulation container that contains
+         the buttons, the receptive field, and 
+         the 2d cross sections -->
+        <div class="simulation">
+            <div class="simulation-type"> <!-- Here's the buttons -->
+                <div id="center-response-simulation" class="simulation-button">Center Response</div>
+                <div id="surround-response-simulation" class="simulation-button">Surround Response</div>
+                <div id="both-response-simulation" class="simulation-button">Both Response</div>
+                <div id="neither-response-simulation" class="simulation-button">Neither Response</div>
+                <div id="custom-response-simulation" class="simulation-button">Custom Response</div>
+            </div>
+
+            <!-- Here's the slider to change the custom simulation
+             circle's size -->
+            <input type="range" id="radiusSlider" min="10" max="100" value="40" step="1" orient="vertical">
+
+            <div class="simulation-family">
+                <div class="simulation-supercontainer">
+
+                    <!-- Receptive field simulation 
+                     Most code is sacrificed at javascript-->
+                    <div class="simulation-container">
+                        <div class="subheading">Receptive Field</div>
+                        <div class="boundary">
+                            <div class="circle" id="surround-area"></div>
+                            <svg class="grid-svg" viewBox="-120 -120 240 240">
+                                <g id="grid"></g>
+                            </svg>
+                            <div class="circle" id="center-area"></div>
+                            <div class="circle" id="draggable-circle"></div>
+                        </div>
+                    </div>
+
+                    <!-- 2d cross section simulation 
+                     Different cells are color coded at css -->
+                    <div class="simulation-container">
+                        <div class="subheading">2D Horizontal Midline Cross-Section</div>
+                        <div class="cross-boundary">
+                            <div class="rod-container">
+                                <div class="surround-rod-container">
+                                    <div class="surround-rod"></div>
+                                    <div class="surround-rod"></div>
+                                    <div class="surround-rod"></div>
+                                    <div class="surround-rod"></div>
+                                    <div class="surround-rod"></div>
+                                </div>
+                                <div class="center-rod-container">
+                                    <div class="center-rod"></div>
+                                    <div class="center-rod"></div>
+                                    <div class="center-rod"></div>
+                                    <div class="center-rod"></div>
+                                </div>
+                                <div class="surround-rod-container">
+                                    <div class="surround-rod"></div>
+                                    <div class="surround-rod"></div>
+                                    <div class="surround-rod"></div>
+                                    <div class="surround-rod"></div>
+                                    <div class="surround-rod"></div>
+                                </div>
+                            </div>
+                            <div class="hc-container">
+                                <div class="hc"></div>
+                                <div class="hc"></div>
+                            </div>
+                            <div class="bpc-container">
+                                <div class="bpc"></div>
+                            </div>
+                            <div class="rgc-container">
+                                <div class="rgc"></div>
+                            </div>
+                            <svg id="connection-lines" class="svg-lines"></svg>
+                        </div>
+                    </div>
+
+                    <!-- Labels for the different cells -->
+                    <div class="label-container">
+                        <div class="spacer1"></div>
+                        <div class="rod-label">Rods</div>
+                        <div class="spacer2"></div>
+                        <div class="hc-label">Horizontal Cells</div>
+                        <div class="spacer3"></div>
+                        <div class="bpc-label">ON Bipolar Cell(s)</div>
+                        <div class="spacer4"></div>
+                        <div class="rgc-label">Retinal Ganglion Cell(s)</div>
+                    </div>
+                </div>
+
+                <!-- The scale for the simulation since
+                 it's color coded blue to yellow -->
+                <div class="legend-container">
+                    <div class="scale-label-container">
+                        <div class="scale-labels">Value: -1</div>
+                        <div class="scale-labels">0</div>
+                        <div class="scale-labels">+1</div>
+                    </div>
+                    <div class="color-scale"></div>
+                    <div class="scale-label-container">
+                        <div class="scale-labels">Cell: Hyperpolarized</div>
+                        <div class="scale-labels">Spontaneous Activity</div>
+                        <div class="scale-labels">Depolarized</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="spacer"><div id="nav-menu-divider" class="divider"></div></div>
+
+
+        <!-- Lecture time -->
+        <div class="lecture-container">
+            <div class="button-supercontainer">
+                <div class="subheading" style="flex-direction: column;">
+                    <h2>Retina and Vision</h2>
+                    <div style="align-self: center;">Explaining <span class="emphasize"><b>Edge Detection</b></span></div>
+                </div>
+                <div class="button-container">
+                    <div id="anatomy-button" class="buttons">1. The Anatomy of the Eye</div>
+                    <div id="biochem-button" class="buttons">2. Biochemistry and Signal Transduction</div>
+                    <div id="rf-button" class="buttons">3. Edge Detection (Sparsification)</div>
+                    <div id="vis-button" class="buttons">4. Visual Illusions</div>
+                </div>
+            </div>
+            <div class="lecture">
+
+                <!-- ANATOMY -->
+                <div id="lecture1-supercontainer" class="lecture-supercontainer">
+                    <h3 class="lecture-title">1. The Anatomy of the Eye</h3>
+                    <div id="lecture1-container">
+                        <div class="lecture-text-container">
+                            <p class="text">
+                                The anatomy of the eye consists of multiple components.
+                                Using the diagram on the right (Figure 1.1) as reference, we have:
+                            </p>
+                            <div class="list">
+                                <ol class="eye-anatomy">
+                                    <li>Posterior segment</li>
+                                    <li>Ora serrata</li>
+                                    <li>Ciliary muscle</li>
+                                    <li>Ciliary zonules</li>
+                                    <li>Schlemm's canal</li>
+                                    <b>
+                                        <li>Pupil</li>
+                                    </b>
+                                    <li>Anterior chamber</li>
+                                    <b>
+                                        <li>Cornea</li>
+                                    </b>
+                                    <b>
+                                        <li>Iris</li>
+                                    </b>
+                                    <li><b>Lens</b> cortex</li>
+                                </ol>
+                                <ol class="eye-anatomy" start="11">
+                                    <li><b>Lens</b> nucleus</li>
+                                    <li>Ciliary process</li>
+                                    <li>Conjunctiva</li>
+                                    <li>Inferior oblique muscle</li>
+                                    <li>Inferior rectus muscle</li>
+                                    <li>Medial rectus muscle</li>
+                                    <li>Retinal arteries and veins</li>
+                                    <li>Optic disc</li>
+                                    <li>Dura mater</li>
+                                    <li>Central retinal artery</li>
+                                </ol>
+                                <ol class="eye-anatomy" start="21">
+                                    <li>Central retinal vein</li>
+                                    <b>
+                                        <li>Optic nerve</li>
+                                    </b>
+                                    <li>Vorticose vein</li>
+                                    <li>Bulbar sheath</li>
+                                    <li>Macula</li>
+                                    <li>Fovea</li>
+                                    <li>Sclera</li>
+                                    <li>Choroid</li>
+                                    <li>Superior rectus muscle</li>
+                                    <b>
+                                        <li>Retina</li>
+                                    </b>
+                                </ol>
+                            </div>
+                            <p>
+                                The most important ones for the retina simulation are bolded, 
+                                while the rest are for anatomy documentation purposes.
+                                <br><br>
+
+                                When light travels into our eyes, it passes through the 
+                                <span class="emphasize"><b>cornea</b> (8)</span> - a clear, dome-shaped covering at the outermost 
+                                of our eyes. After that, light travels through our <span class="emphasize"><b>pupils</b> (6)</span>
+                                - a hole that allows light to travel through. The amount of light 
+                                allowed through the pupils are controlled by the <span class="emphasize"><b>iris</b> (9)</span>. 
+                                The light then goes through the <span class="emphasize"><b>lens</b> (10, 11)</span> - a convex structure that 
+                                focuses light.
+                                After that, light hits the <span class="emphasize"><b>retina</b> (30)</span>, triggering a phototransduction 
+                                cascade, converting light signals into electrical impulses. 
+                                Those electrical impulses then converge at the <span class="emphasize"><b>optic nerve</b> (22)</span> 
+                                and travel to the brain.
+                                <br><br>
+
+                                We will be focusing on the <span class="emphasize"><b>retina</b> (30)</span> for this 
+                                simulation.
+                                <br><br>
+
+                                Let's zoom in on the retina (Figure 1.2). The retina is composed of layers of cells. Those cells carry out different 
+                                functions that essentially does two things - to convert light signals into electrical impulses and 
+                                improve the quality and definition of those impulses. 
+                                Here's the list of the layers and structures inside the retina. 
+                                As usual, the important ones are bolded.
+                            </p>
+                            <div class="list">
+                                <ul class="eye-anatomy" style="list-style: none; padding-left: 0;">
+                                    <li><span class="bullet">RPE</span> Retinal pigment epithelium</li>
+                                    <li><span class="bullet">OS</span> Outer segments of photoreceptor cells</li>
+                                    <li><span class="bullet">IS</span> Inner segments of photoreceptor cells</li>
+                                    <li><span class="bullet">ONL</span> Outer nuclear layer</li>
+                                    <li><span class="bullet">OPL</span> Outer plexiform layer</li>
+                                    <li><span class="bullet">INL</span> Inner nuclear layer</li>
+                                    <li><span class="bullet">IPL</span> Inner plexiform layer</li>
+                                    <li><span class="bullet">GC</span> Ganglion cell layer</li>
+                                </ul>
+                                <ul class="eye-anatomy" style="list-style: none; padding-left: 0;">
+                                    <li><span class="bullet">BM</span> Bruch's membrane</li>
+                                    <li><span class="bullet">P</span> Pigment epithelial cell</li>
+                                    <li><span class="bullet">R</span> <b>Rods</b></li>
+                                    <li><span class="bullet">C</span> <b>Cones</b></li>
+                                    <li><span class="bullet">◁</span> External limiting membrane</li>
+                                    <li><span class="bullet">H</span> <b>Horizontal cell</b></li>
+                                    <li><span class="bullet">Bi</span> <b>Bipolar cell</b></li>
+                                    <li><span class="bullet">M</span> Müller cell</li>
+                                    <li><span class="bullet">A</span> <b>Amacrine cell</b></li>
+                                    <li><span class="bullet">G</span> <b>Retinal ganglion cell</b></li>
+                                    <li><span class="bullet">Ax</span> Axons</li>
+                                </ul>
+                            </div>
+                            <p>
+                                <span class="emphasize rod-color"><b>Rods</b> (R)</span> and <span class="emphasize cone-color"><b>cones</b> (C)</span> are responsible for converting light signals into electrical impulses (phototransduction). The rest of the cells - 
+                                <span class="emphasize hc-color"><b>horizontal cells</b> (H, HC)</span>, <span class="emphasize bpc-color"><b>bipolar cells</b> (Bi, BPC)</span>, and <span class="emphasize ac-color"><b>amacrine cells</b> (A, AC)</span> - are responsible for improving quality and definition (sparsification 
+                                and directional selectivity). <span class="emphasize rgc-color"><b>Retinal ganglion cells</b> (G, RGC)</span> summarizes the inputs from all those cells at a local level and 
+                                send the electrical signals into our brain for conscious processing.
+                                <br><br>
+
+                                Here's an interesting side note: When light hits the retina, it actually hits the <span class="emphasize rgc-color"><b>RGCs</b></span> first, then the <span class="emphasize bpc-color"><b>BPCs</b></span>, all the way to the <span class="emphasize rod-color"><b>rods</b></span> and <span class="emphasize cone-color"><b>cones</b></span>. 
+                                The <span class="emphasize rod-color"><b>rods</b></span> and <span class="emphasize cone-color"><b>cones</b></span> then undergo phototransduction to transmit electrical signals back to the <span class="emphasize rgc-color"><b>RGCs</b></span>. Because of this very weird arrangement of the retina, 
+                                there is a small part of the retina that is replaced by the optic nerve so that the optic nerve can exit the eye and continue the visual pathway. 
+                                As a result, we have a <span class="emphasize"><b>blind spot</b></span>, but our brain compensates that blind spot fairly well so we won't notice.
+                                <br><br>
+
+                                In the visual pathway, after the signals leave the RGCs in the optic nerve, it goes through (Figure 1.3) 
+                                the <span class="emphasize"><b>optic chiasm</b></span>, the <span class="emphasize"><b>optic tract</b></span>, the <span class="emphasize"><b>lateral geniculate body</b> (LGN)</span> in the thalamus, and the <span class="emphasize"><b>optic radiation</b></span> 
+                                all the way to the <span class="emphasize"><b>primary visual cortex</b> (V1)</span>, which further connects to higher visual areas (e.g., in no specific order, V2, V3, MT, IT, MF, AL, etc.).
+                                <br><br>
+
+                                At and beyond the visual cortex, this is where orientation selectivity, direction selectivity, 
+                                color processing (e.g., color constancy), face recognition, etc. are further processed.
+                            </p>
+                        </div>
+                        <div class="lecture-diagram-container">
+                            <div class="image-container">
+                                <a title="Chabacano, CC BY-SA 3.0 &lt;http://creativecommons.org/licenses/by-sa/3.0/&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Eye-diagram_no_circles_border.svg" target="_blank"><img height="400" alt="Diagram of A Human Eye" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Eye-diagram_no_circles_border.svg/512px-Eye-diagram_no_circles_border.svg.png?20130225022808"></a>
+                                <div class="caption">Figure 1.1</div>
+                            </div>
+                            <div class="image-container">
+                                <a title="Peter Hartmann at de.wikipedia, edited by Marc Gabriel Schmid Creating SVG version by Юкатан, CC BY-SA 3.0 &lt;https://creativecommons.org/licenses/by-sa/3.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Retina_layers.svg" target="_blank"><img height="400" alt="Retina layers" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Retina_layers.svg/512px-Retina_layers.svg.png?20180718073723"></a>
+                                <div class="caption">Figure 1.2</div>
+                            </div>
+                            <div class="image-container">
+                                <a title="Mads00, CC BY-SA 4.0 &lt;https://creativecommons.org/licenses/by-sa/4.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Neural_pathway_diagram.svg" target="_blank"><img width="400" alt="Neural pathway diagram" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Neural_pathway_diagram.svg/512px-Neural_pathway_diagram.svg.png?20160606173448"></a>
+                                <div class="caption">Figure 1.3</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- BIOCHEMISTRY -->
+                <div id="lecture2-supercontainer" class="lecture-supercontainer">
+                    <h3 class="lecture-title">2. Biochemistry and Signal Transduction</h3>
+                    <div id="lecture2-container">
+                        <div class="lecture-diagram-container">
+                            <div class="image-container">
+                                <img width="300" title="made in Canva.com, own work" src="figures/figure4.png" alt="The machine inside the cell that takes input(s) and shoots out an output.">
+                                <div class="caption">Figure 2.1</div>
+                            </div>
+                            <div class="image-container">
+                                <a title="Jason J. Corneveaux, wiki user: Caddymob, CC BY 3.0 &lt;https://creativecommons.org/licenses/by/3.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Phototransduction.png" target="_blank"><img width="400" alt="Phototransduction" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Phototransduction.png/1024px-Phototransduction.png?20100418154243"></a>
+                                <div class="caption">Figure 2.2</div>
+                            </div>
+                            <div class="image-container">
+                                <img width="400" title="made in Canva.com, own work" src="figures/figure6.png" alt="Rods and cones as a machine">
+                                <div class="caption">Figure 2.3</div>
+                            </div>
+                            <div class="image-container">
+                                <img width="300" title="made in Canva.com, own work" src="figures/figure7.png" alt="HCs and ACs as a machine">
+                                <div class="caption">Figure 2.4</div>
+                            </div>
+                            <div class="image-container">
+                                <img width="400" title="made in Canva.com, own work" src="figures/figure2.5.png" alt="ON and OFF BPCs as a machine">
+                                <div class="caption">Figure 2.5</div>
+                            </div>
+                        </div>
+                        <div class="lecture-text-container">
+
+                            <!-- Intro to Biochemistry -->
+                            <p>
+                                There are a lot of biochemistry behind each cell in the retina. One of the most well-known biochemical mechanisms in
+                                the retina is <span class="emphasize"><b>phototransduction</b></span> in the <span class="emphasize rod-color"><u>rods</u></span> and <span class="emphasize cone-color"><u>cones</u></span>.
+                                Of course, other cells, like <span class="emphasize hc-color"><u>HCs</u></span>, <span class="emphasize bpc-color"><u>BPCs</u></span>, <span class="emphasize ac-color"><u>ACs</u></span>, and <span class="emphasize rgc-color"><u>RGCs</u></span>
+                                have their own biochemical mechanisms working behind the scenes. So, the purpose 
+                                of this section is to elaborate on those mechanisms.
+                                <br><br>
+
+                                <b>2.1 Biochemical Basis of Signal Transduction in Retinal Cells</b>
+                                <br><br>
+
+                                Cell activity can more or less be generalized into a gradient ranging from -1 to +1, 
+                                with -1 being maximally inhibited activity, +1 being maximally excited activity, and 0 being 
+                                spontaneous activity.
+                            </p>
+                            <div class="list" style="font-size: 20px;">
+                                <div class="small-vertical-scale"></div>
+                                <ul class="eye-anatomy" style="list-style: none; padding-left: 0;">
+                                    <li><span class="bullet">-1</span> Maximal <span class="emphasize hyp-color"><b>hyperpolarization</b></span> (inhibited activity)</li>
+                                    <li><span class="bullet">0</span> <span class="emphasize spont-color"><b>Spontaneous activity</b></span></li>
+                                    <li><span class="bullet">+1</span> Maximal <span class="emphasize dep-color"><b>depolarization</b></span> (excited activity)</li>
+                                </ul>
+                            </div>
+                            <p>
+                                Imagine the cells are machines that take in one or more inputs (cell activity from previous connections) and shoot out one singular output (cell activity - a value between -1 and +1). We can essentially wire them in such a way that
+                                the <span class="emphasize rgc-color"><u>RGCs</u></span> can only respond to a specific pattern of light hitting the <span class="emphasize rod-color"><u>rods</u></span> or <span class="emphasize cone-color"><u>cones</u></span>.
+                                <br><br>
+
+                                Each cell in the retina has 3 components that make up the machine (Figure 2.1).
+                            </p>
+                            <div class="list" style="font-size: 20px;">
+                                <ol class="eye-anatomy">
+                                    <li>
+                                        Neurotransmitter Receptors - 
+                                        where inputs are first detected and processed.
+                                    </li>
+                                    <li>
+                                        Receptor Mechanisms - 
+                                        where the inputs are transformed into outputs.
+                                    </li>
+                                    <li>
+                                        Neurotransmitters (NTs) - 
+                                        what the outputs manifest as.
+                                    </li>
+                                </ol>
+                            </div>
+                            <p>
+                                As we go through this section, we will be introducing different types of NT receptors, what those receptors do, 
+                                and different NTs that can be released by the cell. And by learning these different types of receptors, mechanisms, 
+                                and NTs, we can understand how different cells respond to inputs, process those inputs, and convert them into outputs.
+                                <br><br>
+                            </p>
+
+                            <!-- Phototransduction -->
+                            <p>
+                                <b>2.2 Phototransduction in the Rods and Cones</b>
+                                <br><br>
+
+                                <span class="emphasize rod-color"><u>Rods</u></span> and <span class="emphasize cone-color"><u>cones</u></span> are special because they are the only cells in the retina that take <span class="emphasize dep-color"><b>photons</b></span> presence as inputs. 
+                                For others, they only take neurotransmitters as inputs. <span class="emphasize rod-color"><u>Rods</u></span> and <span class="emphasize cone-color"><u>cones</u></span> then convert <span class="emphasize dep-color"><b>photon</b></span> activity (-1 and +1) 
+                                into electrical signals (-1 and +1, not a gradient).
+                                <br><br>
+
+                                The 3 components of <span class="emphasize rod-color"><u>rods</u></span> and <span class="emphasize cone-color"><u>cones</u></span> are the following:
+                            </p>
+                            <div class="list" style="font-size: 20px;">
+                                <ul class="eye-anatomy" style="list-style: none; padding-left: 0;">
+                                    <li><span class="bullet-plus">Receptor</span> Rhodopsin/cone opsin and transducin (a type of GPCR)</li>
+                                    <li><span class="bullet-plus">Mechanism</span> Phototransduction</li>
+                                    <li><span class="bullet-plus">NTs</span> Glutamate (Glu)</li>
+                                </ul>
+                            </div>
+                            <p>
+                                For the receptors, <span class="emphasize rod-color"><b>rhodopsins</b> (rod opsins for rods)</span> and <span class="emphasize cone-color"><b>cone opsins</b> (for cones)</span> are responsible for photon detection, while <span class="emphasize"><b>transducin</b></span> initiates the mechanism 
+                                based on their activities. Not surprisingly, <span class="emphasize rod-color"><b>rhodopsins</b></span> and <span class="emphasize cone-color"><b>cone opsins</b></span> respond to different scenarios involving <span class="emphasize dep-color"><u>photons</u></span>.
+                            </p>
+                            <div class="small-horizontal-bw-scale"></div>
+                            <ul class="eye-anatomy" style="font-size: 20px;">
+                                <li>
+                                    <span class="emphasize rod-color"><b>Rhodopsins</b></span> are sensitive to the number of photons, but are insensitive to the energy contained in each photon, that is, the wavelength of the light.
+                                    As a result, <span class="emphasize rod-color"><u>rods</u></span> are sensitive to brightness but are insensitive to color.
+                                </li>
+                            </ul>
+                            <ul class="eye-anatomy" style="font-size: 20px;">
+                                <li>
+                                    <span class="emphasize cone-color"><b>Cone opsins</b></span> are sensitive to the energy contained in each photon (the wavenlength of light), but are insensitive to the number of photons.
+                                    As a result, <span class="emphasize cone-color"><u>cones</u></span> are sensitive to color but are insensitive to brightness. This color sensitivity of cones can be further divide them into 3 types.
+                                    <ul>
+                                        <li><span class="emphasize rcone-color"><b>L-cones</b></span> are sensitive to light with long wavelengths, like <span class="emphasize rcone-color"><b>red light</b></span>.</li>
+                                        <li><span class="emphasize gcone-color"><b>M-cones</b></span> are sensitive to light with medium wavelengths, like <span class="emphasize gcone-color"><b>green light</b></span>.</li>
+                                        <li><span class="emphasize bcone-color"><b>S-cones</b></span> are sensitive to light with short wavelengths, like <span class="emphasize bcone-color"><b>blue light</b></span>.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <div class="small-horizontal-rgb-scale"></div>
+                            <p>
+                                In a way, receptors also function like filters. For example, in the presence of <span class="emphasize bcone-color"><b>blue light</b></span>, <span class="emphasize rcone-color"><b>L-cones</b></span> will not 
+                                do anything, no matter how blue the light is. However, if it detects <span class="emphasize rcone-color"><b>red light</b></span>, it will process that input. 
+                                Likewise, if there is <span class="emphasize dep-color"><b>yellow light</b></span> (a combination of red and green light), both <span class="emphasize rcone-color"><b>L-</b></span> and <span class="emphasize gcone-color"><b>M-cones</b></span> will react.
+                                <br><br>
+
+                                In the presence of the "correct" light, after <span class="emphasize"><b>transducin</b></span> - a GPCR - receives the signals from <span class="emphasize rod-color"><b>rhodopsins</b></span> or <span class="emphasize cone-color"><b>cone opsins</b></span>, a subunit dissociates from <span class="emphasize"><b>transducin</b></span>. 
+                                That subunit inhibits an enzyme called <span class="emphasize"><b>phosphodiesterase</b> (PDE)</span>. This, in turn, breaks down <span class="emphasize"><b>cGMP</b></span>, decreasing <span class="emphasize"><b>cGMP</b></span> amount in the cell. Without <span class="emphasize"><b>cGMP</b></span>, 
+                                special ion channels called <span class="emphasize"><b>cyclic nucleotide-gated channels</b> (CNGC)</span> are closed, barring Na+ from entering the cell. 
+                                Since Na+ is blocked from entering the cell, the cell <span class="emphasize hyp-color"><b>hyperpolarizes</b></span> (Figure 2.2).
+                                <br><br>
+
+                                <span class="emphasize rod-color"><u>Rods</u></span> and <span class="emphasize cone-color"><u>cones</u></span> release <span class="emphasize"><b>glutamate</b></span> when <span class="emphasize dep-color"><b>depolarized</b></span>. 
+                                However, since they <span class="emphasize hyp-color"><b>hyperpolarize</b></span> in the presence of the "correct" light, 
+                                there is no neurotransmitter release.
+                                <br><br>
+
+                                So, in the end, an input of +1 (<span class="emphasize dep-color"><i>presence of the "correct" light</i></span>) leads to an output of -1 (<span class="emphasize hyp-color"><b>hyperpolarization</b></span>). On the other hand, 
+                                an input of -1 (<span class="emphasize hyp-color"><i>lack of the "correct" light</i></span>) leads to an output of +1 (<span class="emphasize dep-color"><b>depolarization</b></span>). 
+                                <br><br>
+
+                                In the context of our machine model, <span class="emphasize rod-color"><u>rods</u></span> and <span class="emphasize cone-color"><u>cones</u></span> essentially flip the sign of the inputs to yield an output (Figure 2.3). However, when it comes to color perception, 
+                                it gets more complicated - we'll talk about it when we get there.
+                                <br><br>
+                            </p>
+
+                            <!-- HCs and ACs -->
+                            <p>
+                                <b>2.3 GABAergic HCs and ACs</b>
+                                <br><br>
+
+                                <span class="emphasize hc-color"><u>HCs</u></span> and <span class="emphasize ac-color"><u>ACs</u></span> have the following 3 components:
+                            </p>
+                            <div class="list" style="font-size: 20px;">
+                                <ul class="eye-anatomy" style="list-style: none; padding-left: 0;">
+                                    <li><span class="bullet-plus">Receptor</span> Ionotropic glutamate receptors (iGluR, ion channel)</li>
+                                    <li><span class="bullet-plus">Mechanism</span> Transduction</li>
+                                    <li><span class="bullet-plus">NTs</span> gamma-aminobutyric acid (GABA)</li>
+                                </ul>
+                            </div>
+                            <p>
+                                <span class="emphasize dep-color"><b>Ionotropic glutamate receptors</b> (iGluR)</span> are ion channels that open in the presence of <span class="emphasize"><b>Glu</b></span>. 
+                                When the channel is open, Na+ and Ca++ enters the cell, <span class="emphasize dep-color"><b>depolarizing</b></span> the cell. This process of converting 
+                                chemical signals into electrical signals is called <span class="emphasize"><b>transduction</b></span> (different from <span class="emphasize"><b>phototransduction</b></span>, where 
+                                light signals are converted into electrical signals).
+                                <br><br>
+
+                                The cell, when <span class="emphasize dep-color"><b>depolarized</b></span>, releases <span class="emphasize"><b>gamma-aminobutyric acid</b> (GABA)</span>.
+                                <br><br>
+
+                                So, in the context of our machine model, <span class="emphasize hc-color"><u>HCs</u></span> and <span class="emphasize ac-color"><u>ACs</u></span> essentially maintain the sign of the input. 
+                                If the previous cell they connect to <span class="emphasize dep-color"><b>depolarizes</b></span>, <span class="emphasize hc-color"><u>HCs</u></span> and <span class="emphasize ac-color"><u>ACs</u></span> will <span class="emphasize dep-color"><b>depolarize</b></span> as well (Figure 2.4).
+                                <br><br>
+                            </p>
+
+                            <!-- BPCs -->
+                            <p>
+                                <b>2.4 ON and OFF BPCs</b>
+                                <br><br>
+
+                                Here are the 3 components for <span class="emphasize bpc-color"><u>BPCs</u></span>.
+                            </p>
+                            <div class="list" style="font-size: 20px;">
+                                <ul class="eye-anatomy" style="list-style: none; padding-left: 0;">
+                                    <li><span class="bullet-plus">Receptor</span> Ionotropic or metabotropic glutamate receptors</li>
+                                    <li><span class="bullet-plus">Mechanism</span> Transduction</li>
+                                    <li><span class="bullet-plus">NTs</span> Glutamate (Glu)</li>
+                                </ul>
+                            </div>
+                            <p>
+                                We discussed <span class="emphasize dep-color"><b>iGluRs</b></span> before - they are ion channels that open in the presence of <span class="emphasize"><b>Glu</b></span>, allowing Na+ and Ca++ entry into the cell, <span class="emphasize dep-color"><b>depolarizing</b></span> it in the process. 
+                                <span class="emphasize hyp-color"><b>Metabotropic glutamate receptors</b> (mGluR)</span>, on the other hand, have the exact opposite effect. <span class="emphasize hyp-color"><b>mGluRs</b></span> are a type of GPCRs, so in the presence of <span class="emphasize"><b>Glu</b></span>, 
+                                <span class="emphasize hyp-color"><b>mGluRs</b></span> activates a G-protein, which then will eventually lead to the opening of specific ion channels that do one thing - allow K+ to leave the cell. 
+                                Since K+ are leaving the cell, the cell <span class="emphasize hyp-color"><b>hyperpolarizes</b></span>.
+                                <br><br>
+
+                                <span class="emphasize bpc-color"><u>BPCs</u></span> release <span class="emphasize"><b>Glu</b></span> when <span class="emphasize dep-color"><b>depolarized</b></span>. 
+                                <br><br>
+
+                                Here's the interesting part. There are 2 types of <span class="emphasize bpc-color"><u>BPCs</u></span> - <span class="emphasize onbpc-color"><b>ON BPCs</b></span> and <span class="emphasize offbpc-color"><b>OFF BPCs</b></span>. 
+                                ON BPCs have mGluRs as their receptors while OFF BPCs have iGluRs as their receptors.
+                                As a result...
+                            </p>
+                            <div class="list" style="font-size: 20px;">
+                                <ul class="eye-anatomy">
+                                    <li><span class="emphasize onbpc-color"><b>ON BPCs</b></span> (with <span class="emphasize hyp-color"><b>mGluRs</b></span>) will <span class="emphasize hyp-color"><b>hyperpolarize</b></span> in the presence of <span class="emphasize"><b>Glu</b></span>.</li>
+                                    <li><span class="emphasize offbpc-color"><b>OFF BPCs</b></span> (with <span class="emphasize dep-color"><b>iGluRs</b></span>) will <span class="emphasize dep-color"><b>depolarize</b></span> in the presence of <span class="emphasize"><b>Glu</b></span>.</li>
+                                </ul>
+                            </div>
+                            <p>
+                                So, in the context of our machine model, <span class="emphasize onbpc-color"><b>ON BPCs</b></span> will flip the sign of the inputs, 
+                                while <span class="emphasize offbpc-color"><b>OFF BPCs</b></span> will maintain the sign of the inputs (Figure 2.5).
+                                <br><br>
+                            </p>
+
+                            <!-- RGCs -->
+                            <p>
+                                <b>2.5 Algorithmic Determination of RGC Activity</b>
+                                <br><br>
+
+                                Before we talk about the algorithm, let's quickly look at the components of the <span class="emphasize rgc-color"><u>RGC</u></span>.
+                            </p>
+                            <div class="list" style="font-size: 20px;">
+                                <ul class="eye-anatomy" style="list-style: none; padding-left: 0;">
+                                    <li><span class="bullet-plus">Receptor</span> Ionotropic glutamate receptors</li>
+                                    <li><span class="bullet-plus">Mechanism</span> Transduction</li>
+                                    <li><span class="bullet-plus">NTs</span> Glutamate (Glu)</li>
+                                </ul>
+                            </div>
+                            <p>
+                                So, how can we algorithmically determine the activity of <span class="emphasize rgc-color"><u>RGCs</u></span> using our machine model? The answer lies in mixing and matching all those different cells 
+                                in certain ways. It's like forming a circuit of cells - the circuit will have different functions depending on how we wire the circuit.
+                                <br><br>
+
+                                Here are some ground rules for how we should wire our circuit:
+                            </p>
+                            <div class="list">
+                                <ul class="eye-anatomy" style="list-style: none; padding-left: 0;">
+                                    <li><span class="bullet">Rule 1</span> The circuit will always start with <span class="emphasize rod-color"><u>rods</u></span> or <span class="emphasize cone-color"><u>cones</u></span>.</li>
+                                    <li><span class="bullet">Rule 2</span> The circuit will always end with <span class="emphasize rgc-color"><u>RGCs</u></span>.</li>
+                                    <li><span class="bullet">Rule 3</span> The circuit will always contain <span class="emphasize rod-color"><u>rods</u></span> or <span class="emphasize cone-color"><u>cones</u></span>, <span class="emphasize bpc-color"><u>BPCs</u></span>, and <span class="emphasize rgc-color"><u>RGCs</u></span>.</li>
+                                    <li><span class="bullet">Rule 4</span> If a cell releases a type of neurotransmitter, the next cell has to have a receptor that responds to that type of neurotransmitter.</li>
+                                </ul>
+                            </div>
+                            <p>
+                                This somehow flexible ruleset gives us a lot of possibilities of circuits (e.g., there is no rule against feedback inhibition). Feel free to experiment!
+                                <br><br>
+
+                                Using this, let's look at the simplest circuit: 
+                            </p>
+                            <div class="list" style="font-size: 20px;">
+                                <ul class="eye-anatomy" style="list-style: none; padding-left: 0;">
+                                    <li><span class="bullet-plus">Circuit 1a</span> <span class="emphasize rod-color"><u>Rod</u></span> -> <span class="emphasize onbpc-color"><u>ON BPC</u></span> -> <span class="emphasize rgc-color"><u>RGC</u></span></li>
+                                    <li><span class="bullet-plus">Circuit 1b</span> <span class="emphasize rod-color"><u>Rod</u></span> -> <span class="emphasize offbpc-color"><u>OFF BPC</u></span> -> <span class="emphasize rgc-color"><u>RGC</u></span></li>
+                                </ul>
+                            </div>
+                            <p>
+                                circuits <span class="emphasize" title="Rod -> ON BPC -> RGC"><i>1a</i></span> and <span class="emphasize" title="Rod -> OFF BPC -> RGC"><i>1b</i></span> basically boils down to the following: 
+                            </p>
+                            <div class="list">
+                                <ul class="eye-anatomy">
+                                    <li>
+                                        If there is light present in <span class="emphasize" title="Rod -> ON BPC -> RGC"><i>1a</i></span>,
+                                        the <span class="emphasize rod-color"><u>rod</u></span> will <span class="emphasize hyp-color"><b>hyperpolarize</b></span>,
+                                        the <span class="emphasize onbpc-color"><u>ON BPC</u></span> will <span class="emphasize dep-color"><b>depolarize</b></span>,
+                                        and the <span class="emphasize rgc-color"><u>RGC</u></span> will <span class="emphasize dep-color"><b>depolarize</b></span>.
+                                    </li>
+                                    <li>
+                                        If there is no light present in <span class="emphasize" title="Rod -> ON BPC -> RGC"><i>1a</i></span>,
+                                        the <span class="emphasize rod-color"><u>rod</u></span> will <span class="emphasize dep-color"><b>depolarize</b></span>,
+                                        the <span class="emphasize onbpc-color"><u>ON BPC</u></span> will <span class="emphasize hyp-color"><b>hyperpolarize</b></span>,
+                                        and the <span class="emphasize rgc-color"><u>RGC</u></span> will <span class="emphasize hyp-color"><b>hyperpolarize</b></span>.
+                                    </li>
+                                    <li>
+                                        If there is light present in <span class="emphasize" title="Rod -> OFF BPC -> RGC"><i>1b</i></span>,
+                                        the <span class="emphasize rod-color"><u>rod</u></span> will <span class="emphasize hyp-color"><b>hyperpolarize</b></span>,
+                                        the <span class="emphasize offbpc-color"><u>OFF BPC</u></span> will <span class="emphasize hyp-color"><b>hyperpolarize</b></span>,
+                                        and the <span class="emphasize rgc-color"><u>RGC</u></span> will <span class="emphasize hyp-color"><b>hyperpolarize</b></span>.
+                                    </li>
+                                    <li>
+                                        If there is no light present in <span class="emphasize" title="Rod -> OFF BPC -> RGC"><i>1b</i></span>,
+                                        the <span class="emphasize rod-color"><u>rod</u></span> will <span class="emphasize dep-color"><b>depolarize</b></span>,
+                                        the <span class="emphasize offbpc-color"><u>OFF BPC</u></span> will <span class="emphasize dep-color"><b>depolarize</b></span>,
+                                        and the <span class="emphasize rgc-color"><u>RGC</u></span> will <span class="emphasize dep-color"><b>depolarize</b></span>.
+                                    </li>
+                                </ul>
+                            </div>
+                            <table border="1" cellspacing="0" cellpadding="8">
+                                <thead>
+                                    <tr>
+                                        <th>Circuit</th>
+                                        <th>Light</th>
+                                        <th class="emphasize rod-color">Rod</th>
+                                        <th class="emphasize bpc-color">BPC</th>
+                                        <th class="emphasize rgc-color">RGC</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="2"><i>1a</i> (Rod -> ON BPC -> RGC)</td>
+                                        <td>+1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                        <td class="emphasize dep-color">+1 (ON)</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                        <td class="emphasize hyp-color">-1 (ON)</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                    </tr>
+                                    <tr>
+                                        <td rowspan="2"><i>1b</i> (Rod -> OFF BPC -> RGC)</td>
+                                        <td>+1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                        <td class="emphasize hyp-color">-1 (OFF)</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                        <td class="emphasize dep-color">+1 (OFF)</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p>
+                                The circuits will get more and more complicated as we go on. For example, the circuit we will discuss in 
+                                edge detection have 5 major elements.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- EDGE DETECTION -->
+                <div id="lecture3-supercontainer" class="lecture-supercontainer">
+                    <h3 class="lecture-title">3. Edge Detection (Sparsification)</h3>
+                    <div id="lecture3-container">
+                        <div class="lecture-text-container">
+                            <p>
+                                So, we have the ability to form circuits. Depending on how we construct the circuit, <span class="emphasize rgc-color"><u>RGCs</u></span> will behave differently. 
+                                Evolution has helped us develop a good few circuits in the retina, with each circuit refining our vision definition. 
+                                For example, this section is about <span class="emphasize"><b>edge detection</b> (sparsification)</span> - a type of retinal circuit that specializes in detecting edges 
+                                or boundaries of an object.
+                                <br><br>
+
+                                Here, we introduce the concept of <span class="emphasize"><b>receptive fields</b> (RF)</span>.
+                            </p>
+                            <div class="list" style="font-size: 20px;">
+                                <ul class="eye-anatomy">
+                                    <li>
+                                        The <span class="emphasize"><b>receptive field</b> (RF)</span> of an <span class="emphasize rgc-color"><u>RGC</u></span> is the area that the <span class="emphasize rgc-color"><u>RGC</u></span> can respond to in our visual field. <span class="emphasize"><b>RFs</b></span> of different
+                                        <span class="emphasize rgc-color"><u>RGCs</u></span> can overlap and vary by size - <span class="emphasize"><b>RFs</b></span> are smaller around the fovea but bigger around the periphery.
+                                    </li>
+                                    <li>
+                                        We can divide an <span class="emphasize"><b>RF</b></span> of an <span class="emphasize rgc-color"><u>RGC</u></span> into 2 regions - a <span class="emphasize"><b>center</b></span> region and a <span class="emphasize"><b>surround</b></span> region. We'll see why we do that in a second (Figure 3.1).
+                                    </li>
+                                </ul>
+                            </div>
+                            <p>
+                                Now, let's introduce 2 new circuits.
+                            </p>
+                            <div class="list" style="font-size: 20px;">
+                                <ul class="eye-anatomy" style="list-style: none; padding-left: 0;">
+                                    <li><span class="bullet-plus">Circuit 2a</span> <span class="emphasize rod-color">Surround <u>Rod</u></span> -> <span class="emphasize hc-color"><u>HC</u></span> -> <span class="emphasize rod-color">Center <u>Rod</u></span> -> <span class="emphasize onbpc-color"><u>ON BPC</u></span> -> <span class="emphasize rgc-color"><u>RGC</u></span></li>
+                                    <li><span class="bullet-plus">Circuit 2b</span> <span class="emphasize rod-color">Surround <u>Rod</u></span> -> <span class="emphasize hc-color"><u>HC</u></span> -> <span class="emphasize rod-color">Center <u>Rod</u></span> -> <span class="emphasize offbpc-color"><u>OFF BPC</u></span> -> <span class="emphasize rgc-color"><u>RGC</u></span></li>
+                                </ul>
+                            </div>
+                            <p>
+                                Similarly, the last 3 elements in this circuit are basically from circuits <span class="emphasize" title="Rod -> ON BPC -> RGC"><i>1a</i></span> and <span class="emphasize" title="Rod -> OFF BPC -> RGC"><i>1b</i></span>. 
+                                There are 2 differences though - our new circuits have 2 extra elements (surround <span class="emphasize rod-color"><u>rods</u></span> and <span class="emphasize hc-color"><u>HCs</u></span>) and new adjectives (center and surround). 
+                                See Figure 3.2 for a diagram of circuit <span class="emphasize" title="surround rods -> HCs -> center rods -> ON BPC -> RGC"><i>2a</i></span>.
+                                <br><br>
+
+                                Knowing that <span class="emphasize hc-color"><u>HCs</u></span> are GABAergic, the connected center <span class="emphasize rod-color"><u>rods</u></span> can be <span class="emphasize hyp-color"><u>hyperpolarized</u></span> by <span class="emphasize hc-color"><u>HCs</u></span> depending on surround <span class="emphasize rod-color"><u>rods</u></span> activity. 
+                                Let's use circuit <span class="emphasize" title="surround rods -> HCs -> center rods -> ON BPC -> RGC"><i>2a</i></span> as an example.
+                            </p>
+                            <div class="list">
+                                <ul class="eye-anatomy">
+                                    <li>
+                                        If there is no light present in <span class="emphasize" title="surround rods -> HCs -> center rods -> ON BPC -> RGC"><i>2a</i></span> surround <span class="emphasize rod-color"><u>rods</u></span>, and if there is light present in <span class="emphasize" title="surround rods -> HCs -> center rods -> ON BPC -> RGC"><i>2a</i></span> center <span class="emphasize rod-color"><u>rods</u></span> (<span class="emphasize"><b>Center Response</b></span>):
+                                        <ul>
+                                            <li>Surround <span class="emphasize rod-color"><u>rods</u></span> will <span class="emphasize dep-color"><u>depolarize</u></span>, and the <span class="emphasize hc-color"><u>HCs</u></span> will <span class="emphasize dep-color"><u>depolarize</u></span>, releasing GABA.</li>
+                                            <li>Center <span class="emphasize rod-color"><u>rods</u></span> will <span class="emphasize hyp-color"><u>hyperpolarize</u></span>.</li>
+                                        </ul> 
+                                        Since the <span class="emphasize dep-color"><u>depolarized</u></span> <span class="emphasize hc-color"><u>HCs</u></span> release GABA, center <span class="emphasize rod-color"><u>rods</u></span> will stay <span class="emphasize hyp-color"><u>hyperpolarized</u></span>. 
+                                        The ON BPC will <span class="emphasize dep-color"><u>depolarize</u></span>, and the RGC will <span class="emphasize dep-color"><u>depolarize</u></span>.
+                                    </li>
+                                    <br>
+                                    <li>
+                                        If there is light present in <span class="emphasize" title="surround rods -> HCs -> center rods -> ON BPC -> RGC"><i>2a</i></span> surround <span class="emphasize rod-color"><u>rods</u></span>, and if there is no light present in <span class="emphasize" title="surround rods -> HCs -> center rods -> ON BPC -> RGC"><i>2a</i></span> center <span class="emphasize rod-color"><u>rods</u></span> (<span class="emphasize"><b>Surround Response</b></span>):
+                                        <ul>
+                                            <li>Surround <span class="emphasize rod-color"><u>rods</u></span> will <span class="emphasize hyp-color"><u>hyperpolarize</u></span>, and the <span class="emphasize hc-color"><u>HCs</u></span> will <span class="emphasize hyp-color"><u>hyperpolarize</u></span>, not releasing GABA.</li>
+                                            <li>Center <span class="emphasize rod-color"><u>rods</u></span> will <span class="emphasize dep-color"><u>depolarize</u></span>.</li>
+                                        </ul>
+                                        Since the <span class="emphasize hyp-color"><u>hyperpolarized</u></span> <span class="emphasize hc-color"><u>HCs</u></span> do not release GABA, center <span class="emphasize rod-color"><u>rods</u></span> will stay <span class="emphasize dep-color"><u>depolarized</u></span>.
+                                        The ON BPC will <span class="emphasize hyp-color"><u>hyperpolarize</u></span>, and the RGC will <span class="emphasize hyp-color"><u>hyperpolarize</u></span>.
+                                    </li>
+                                    <br>
+                                    <li>
+                                        If there is light present in <span class="emphasize" title="surround rods -> HCs -> center rods -> ON BPC -> RGC"><i>2a</i></span> surround <span class="emphasize rod-color"><u>rods</u></span>, and if there is light present in <span class="emphasize" title="surround rods -> HCs -> center rods -> ON BPC -> RGC"><i>2a</i></span> center <span class="emphasize rod-color"><u>rods</u></span> as well (<span class="emphasize"><b>Both Response</b></span>):
+                                        <ul>
+                                            <li>Surround <span class="emphasize rod-color"><u>rods</u></span> will <span class="emphasize hyp-color"><u>hyperpolarize</u></span>, and the <span class="emphasize hc-color"><u>HCs</u></span> will <span class="emphasize hyp-color"><u>hyperpolarize</u></span>, not releasing GABA.</li>
+                                            <li>Center <span class="emphasize rod-color"><u>rods</u></span> will <span class="emphasize hyp-color"><u>hyperpolarize</u></span>.</li>
+                                        </ul>
+                                        Since the <span class="emphasize hyp-color"><u>hyperpolarized</u></span> <span class="emphasize hc-color"><u>HCs</u></span> do not release GABA, center <span class="emphasize rod-color"><u>rods</u></span> won't be as <span class="emphasize hyp-color"><u>hyperpolarized</u></span> - <span class="emphasize spont-color"><u>spontaneous activity</u></span>. 
+                                        The ON BPC will have <span class="emphasize spont-color"><u>spontaneous activity</u></span>, and the RGC will have <span class="emphasize spont-color"><u>spontaneous activity</u></span>.
+                                    </li>
+                                    <br>
+                                    <li>
+                                        If there is no light present in <span class="emphasize" title="surround rods -> HCs -> center rods -> ON BPC -> RGC"><i>2a</i></span> surround <span class="emphasize rod-color"><u>rods</u></span>, and if there is no light present in <span class="emphasize" title="surround rods -> HCs -> center rods -> ON BPC -> RGC"><i>2a</i></span> center <span class="emphasize rod-color"><u>rods</u></span> either (<span class="emphasize"><b>Neither Response</b></span>):
+                                        <ul>
+                                            <li>Surround <span class="emphasize rod-color"><u>rods</u></span> will <span class="emphasize dep-color"><u>depolarize</u></span>, and the <span class="emphasize hc-color"><u>HCs</u></span> will <span class="emphasize dep-color"><u>depolarize</u></span>, releasing GABA.</li>
+                                            <li>Center <span class="emphasize rod-color"><u>rods</u></span> will <span class="emphasize dep-color"><u>depolarize</u></span>.</li>
+                                        </ul>
+                                        Since the <span class="emphasize dep-color"><u>depolarized</u></span> <span class="emphasize hc-color"><u>HCs</u></span> release GABA, center <span class="emphasize rod-color"><u>rods</u></span> won't be as depolarized - <span class="emphasize spont-color"><u>spontaneous activity</u></span>. 
+                                        The ON BPC will have <span class="emphasize spont-color"><u>spontaneous activity</u></span>, and the RGC will have <span class="emphasize spont-color"><u>spontaneous activity</u></span>.
+                                    </li>
+                                </ul>
+                            </div>
+                            <table border="1" cellspacing="0" cellpadding="8">
+                                <thead>
+                                    <tr>
+                                        <th>Circuit</th>
+                                        <th>Scenario</th>
+                                        <th>Light</th>
+                                        <th class="emphasize rod-color">Rod</th>
+                                        <th class="emphasize hc-color"> HC</th>
+                                        <th class="emphasize bpc-color">BPC</th>
+                                        <th class="emphasize rgc-color">RGC</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="8"><i>2a</i></td>
+                                        <td rowspan="2">Center Response</td>
+                                        <td>+1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                        <td></td>
+                                        <td rowspan="2" class="emphasize dep-color">+1 (ON)</td>
+                                        <td rowspan="2" class="emphasize dep-color">+1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                    </tr>
+                                    <tr>
+                                        <td rowspan="2">Surround Response</td>
+                                        <td>-1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                        <td></td>
+                                        <td rowspan="2" class="emphasize hyp-color">-1 (ON)</td>
+                                        <td rowspan="2" class="emphasize hyp-color">-1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>+1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                    </tr>
+                                    <tr>
+                                        <td rowspan="2">Both Response</td>
+                                        <td>+1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                        <td></td>
+                                        <td rowspan="2" class="emphasize spont-color">0 (ON)</td>
+                                        <td rowspan="2" class="emphasize spont-color">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>+1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                    </tr>
+                                    <tr>
+                                        <td rowspan="2">Neither Response</td>
+                                        <td>-1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                        <td></td>
+                                        <td rowspan="2" class="emphasize spont-color">0 (ON)</td>
+                                        <td rowspan="2" class="emphasize spont-color">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p>
+                                For circuit <span class="emphasize" title="Surround Rod -> HC -> Center Rod -> OFF BPC -> RGC"><i>2b</i></span>, simply flip the signs of values in the <span class="emphasize bpc-color"><u>BPC</u></span> and <span class="emphasize rgc-color"><u>RGC</u></span> columns, since 
+                                the only difference between <span class="emphasize" title="Surround Rod -> HC -> Center Rod -> ON BPC -> RGC"><i>2a</i></span> and <span class="emphasize" title="Surround Rod -> HC -> Center Rod -> OFF BPC -> RGC"><i>2b</i></span> is the <span class="emphasize onbpc-color"><u>ON</u></span> and <span class="emphasize offbpc-color"><u>OFF</u></span> BPCs.
+                            </p>
+                            <table border="1" cellspacing="0" cellpadding="8">
+                                <thead>
+                                    <tr>
+                                        <th>Circuit</th>
+                                        <th>Scenario</th>
+                                        <th>Light</th>
+                                        <th class="emphasize rod-color">Rod</th>
+                                        <th class="emphasize hc-color"> HC</th>
+                                        <th class="emphasize bpc-color">BPC</th>
+                                        <th class="emphasize rgc-color">RGC</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="8"><i>2b</i></td>
+                                        <td rowspan="2">Center Response</td>
+                                        <td>+1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                        <td></td>
+                                        <td rowspan="2" class="emphasize hyp-color">-1 (OFF)</td>
+                                        <td rowspan="2" class="emphasize hyp-color">-1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                    </tr>
+                                    <tr>
+                                        <td rowspan="2">Surround Response</td>
+                                        <td>-1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                        <td></td>
+                                        <td rowspan="2" class="emphasize dep-color">+1 (OFF)</td>
+                                        <td rowspan="2" class="emphasize dep-color">+1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>+1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                    </tr>
+                                    <tr>
+                                        <td rowspan="2">Both Response</td>
+                                        <td>+1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                        <td></td>
+                                        <td rowspan="2" class="emphasize spont-color">0 (OFF)</td>
+                                        <td rowspan="2" class="emphasize spont-color">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>+1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                        <td class="emphasize hyp-color">-1</td>
+                                    </tr>
+                                    <tr>
+                                        <td rowspan="2">Neither Response</td>
+                                        <td>-1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                        <td></td>
+                                        <td rowspan="2" class="emphasize spont-color">0 (OFF)</td>
+                                        <td rowspan="2" class="emphasize spont-color">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                        <td class="emphasize dep-color">+1</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p>
+                                For a better understanding of this concept, the simulation at the top of this webpage provides us with a visualization 
+                                of circuit <span class="emphasize" title="Surround Rod -> HC -> Center Rod -> ON BPC -> RGC"><i>2a</i></span> under all 4 scenarios: <span class="emphasize"><b>center</b></span>, <span class="emphasize"><b>surround</b></span>, <span class="emphasize"><b>both</b></span>, and <span class="emphasize"><b>neither</b></span> responses. 
+                                There is also a custom response option available, which allows us to drag the circle around to see how it affects retinal cell activities.
+                                <br><br>
+
+                                Once we got ourselves acquainted with this <span class="emphasize"><b>edge detection</b></span> algorithm of sorts, let's take a step back and generalize this concept. 
+                                This algorithm essentially divides the <span class="emphasize"><b>receptive field</b></span> into 2 regions - a <span class="emphasize"><b>center RF</b></span> and a <span class="emphasize"><b>surround RF</b></span>. 
+                                The center <span class="emphasize rod-color"><u>rods</u></span> still do their jobs as usual, as detailed in circuits <span class="emphasize" title="Rod -> ON BPC -> RGC"><i>1a</i></span> and <span class="emphasize" title="Rod -> OFF BPC -> RGC"><i>1b</i></span>. 
+                                The surround <span class="emphasize rod-color"><u>rods</u></span>, on the other hand, inhibit center <span class="emphasize rod-color"><u>rods</u></span> via <span class="emphasize hc-color"><u>HCs</u></span> when they detect light. 
+                                This mechanism involving surround <span class="emphasize rod-color"><u>rods</u></span> inhibiting center <span class="emphasize rod-color"><u>rods</u></span> via <span class="emphasize hc-color"><u>HCs</u></span> when light is present is called <span class="emphasize"><b>lateral inhibition</b></span>. 
+                                The <span class="emphasize rgc-color"><u>RGCs</u></span> also get names. <span class="emphasize rgc-color"><u>RGCs</u></span> in circuit <span class="emphasize" title="Surround Rod -> HC -> Center Rod -> ON BPC -> RGC"><i>2a</i></span> are called <span class="emphasize rgc-color"><b>ON-center RGCs</b></span>, 
+                                while <span class="emphasize rgc-color"><u>RGCs</u></span> in circuit <span class="emphasize" title="Surround Rod -> HC -> Center Rod -> OFF BPC -> RGC"><i>2b</i></span> are called <span class="emphasize rgc-color"><b>OFF-center RGCs</b></span>.
+                            </p>
+                        </div>
+                        <div class="lecture-diagram-container">
+                            <div class="image-container">
+                                <img width="400" title="made in Canva.com, own work" src="figures/figure3.1.png" alt="Receptive fields from different perspectives">
+                                <div class="caption">Figure 3.1</div>
+                            </div>
+                            <div class="image-container">
+                                <img width="400" title="made in HTML, CSS, and JavaScript, own work" src="figures/figure3.2.png" alt="Diagram of circuit 2a">
+                                <div class="caption">Figure 3.2</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual illusions -->
+                <div id="lecture4-supercontainer" class="lecture-supercontainer">
+                    <h3 class="lecture-title">4. Visual Illusions</h3>
+                    <div id="lecture4-container">
+                        <div class="lecture-diagram-container">
+                            <div class="image-container">
+                                <img width="400" title="Hermann grid illusion with black grid on white background (left) and white grid on black background (right)" src="figures/figure4.1.png" alt="The Hermann grid illusion">
+                                <div class="caption">Figure 4.1</div>
+                            </div>
+                            <div class="image-container">
+                                <img width="400" title="Made in canva.com, own work" src="figures/figure4.2.png" alt="The Hermann grid illusion zoomed in">
+                                <div class="caption">Figure 4.2</div>
+                            </div>
+                            <div class="image-container">
+                                <img width="400" title="Made in canva.com, own work" src="figures/figure4.3.png" alt="The Hermann grid illusion zoomed in">
+                                <div class="caption">Figure 4.3</div>
+                            </div>
+                            <div class="image-container">
+                                <img width="400" title="Made in canva.com, own work" src="figures/figure4.4.png" alt="The Hermann grid illusion zoomed in">
+                                <div class="caption">Figure 4.4</div>
+                            </div>
+                            <div class="image-container">
+                                <a title="The original uploader was Aliwiki at French Wikipedia., FAL, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Bandes_de_mach.PNG"><img width="400" alt="Bandes de mach" src="https://upload.wikimedia.org/wikipedia/commons/9/97/Bandes_de_mach.PNG?20080912105029"></a>
+                                <div class="caption">Figure 4.5</div>
+                            </div>
+                            <div class="image-container">
+                                <a title="Cmglee, CC BY-SA 4.0 &lt;https://creativecommons.org/licenses/by-sa/4.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Mach_band_cross.svg"><img width="400" alt="Mach band cross" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Mach_band_cross.svg/512px-Mach_band_cross.svg.png?20230726161621"></a>
+                                <div class="caption">Figure 4.6</div>
+                            </div>
+                            <div class="image-container">
+                                <img width="400" title="Made in canva.com, own work" src="figures/figure4.7.png" alt="The Mach band illusion zoomed in">
+                                <div class="caption">Figure 4.7</div>
+                            </div>
+                        </div>
+                        <div class="lecture-text-container">
+                            <p>
+                                Using the ON- and OFF-center <span class="emphasize rgc-color"><u>RGC</u></span> circuits (Circuits <span class="emphasize" title="Surround Rod -> HC -> Center Rod -> ON BPC -> RGC"><i>2a</i></span> and <span class="emphasize" title="Surround Rod -> HC -> Center Rod -> OFF BPC -> RGC"><i>2b</i></span>, respectively), 
+                                we can explain certain visual illusions.
+                                <br><br><br>
+
+                                <b>4.1 The Hermann Grid Illusion</b>
+                                <br><br>
+
+                                The <span class="emphasize"><b>Hermann grid illusion</b> (Figure 4.1)</span> consists of a black grid on a white background (or vice versa), 
+                                forming a series of intersections. When looking at the grid, faint grayish spots appear at the intersections, 
+                                but they vanish when directly fixated on. The illusion creates the false perception of fluctuating dark spots that aren't actually present, 
+                                making it seem like the intersections are darker than the rest of the white spaces. 
+                                This effect is strongest in peripheral vision and disappears when focusing on a specific intersection.
+                            </p>
+                            <ul class="eye-anatomy" style="font-size: 20px;">
+                                <li><b>Question 1:</b> Why are there gray dots at the intersections in our periphery?</li>
+                            </ul>
+                            <p>
+                                The answer lies in our <span class="emphasize"><u>edge detection</u> (sparsification)</span> circuit. 
+                                Let's look at some <span class="emphasize"><u>receptive fields</u></span> at our periphery when we look at the grid.
+                                <br><br>
+
+                                Figure 4.2 describes <span class="emphasize"><u>receptive fields</u></span> that are responsible for the gray dots in our periphery. Observe <span class="emphasize"><u>receptive fields</u></span> 1 and 2 
+                                and assume ON-center <span class="emphasize rgc-color"><u>RGC</u></span> circuits.
+                            </p>
+                            <ul class="eye-anatomy">
+                                <li><b>RF1:</b> There is an excited center <span class="emphasize"><u>RF</u></span> and a relatively more excited surround <span class="emphasize"><u>RF</u></span>. As a result, there will be more <span class="emphasize"><u>lateral inhibition</u></span>, leading to a <span class="emphasize hyp-color"><u>less depolarized</u></span> <span class="emphasize rgc-color"><u>RGC</u></span>.</li>
+                                <li><b>RF2:</b> There is an excited center <span class="emphasize"><u>RF</u></span> and a relatively less excited surround <span class="emphasize"><u>RF</u></span>. As a result, there will be less <span class="emphasize"><u>lateral inhibition</u></span>, leading to a <span class="emphasize dep-color"><u>more depolarized</u></span> <span class="emphasize rgc-color"><u>RGC</u></span>.</li>
+                            </ul>
+                            <table border="1" cellspacing="0" cellpadding="8">
+                                <thead>
+                                    <tr>
+                                        <th>RF</th>
+                                        <th>Center RF Rods</th>
+                                        <th>Surround RF Rods</th>
+                                        <th class="emphasize">Lateral Inhibition</th>
+                                        <th class="emphasize rgc-color">RGC</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><i>RF 1</i></td>
+                                        <td>Excited</td>
+                                        <td>More Excited</td>
+                                        <td>More</td>
+                                        <td class="emphasize hyp-color">Less Depolarized</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i>RF 2</i></td>
+                                        <td>Excited</td>
+                                        <td>Less Excited</td>
+                                        <td>Less</td>
+                                        <td class="emphasize dep-color">More Depolarized</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p>
+                                Since RF2 has less <span class="emphasize"><u>lateral inhibition</u></span> than RF1, RF1 will present a slightly darker shade compared to RF2, giving the intersection a faint grayish spot compared to the white lines.
+                                <br><br>
+
+                                Similarly, for the white grids on black background version, we have Figure 4.3 with <span class="emphasize"><u>receptive fields</u></span> 3 and 4 (Still assume ON-center <span class="emphasize rgc-color"><u>RGC</u></span> circuits).
+                            </p>
+                            <ul class="eye-anatomy">
+                                <li><b>RF3:</b> There is a non-excited center <span class="emphasize"><u>RF</u></span> and a relatively less excited surround <span class="emphasize"><u>RF</u></span>. As a result, there will be less <span class="emphasize"><u>lateral inhibition</u></span>, leading to a <span class="emphasize dep-color"><u>more depolarized</u></span> <span class="emphasize rgc-color"><u>RGC</u></span>.</li>
+                                <li><b>RF4:</b> There is a non-excited center <span class="emphasize"><u>RF</u></span> and a relatively more excited surround <span class="emphasize"><u>RF</u></span>. As a result, there will be more <span class="emphasize"><u>lateral inhibition</u></span>, leading to a <span class="emphasize hyp-color"><u>less depolarized</u></span> <span class="emphasize rgc-color"><u>RGC</u></span>.</li>
+                            </ul>
+                            <table border="1" cellspacing="0" cellpadding="8">
+                                <thead>
+                                    <tr>
+                                        <th>RF</th>
+                                        <th>Center RF Rods</th>
+                                        <th>Surround RF Rods</th>
+                                        <th class="emphasize">Lateral Inhibition</th>
+                                        <th class="emphasize rgc-color">RGC</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><i>RF 3</i></td>
+                                        <td>Not Excited</td>
+                                        <td>Less Excited</td>
+                                        <td>Less</td>
+                                        <td class="emphasize dep-color">More Depolarized</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i>RF 4</i></td>
+                                        <td>Not Excited</td>
+                                        <td>More Excited</td>
+                                        <td>More</td>
+                                        <td class="emphasize hyp-color">Less Depolarized</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p>
+                                Since RF3 has less <span class="emphasize"><u>lateral inhibition</u></span> than RF4, RF3 will present a slightly lighter shade compared to RF4, giving the intersection a faint grayish spot compared to the black lines.
+                            </p>
+                            <ul class="eye-anatomy" style="font-size: 20px;">
+                                <li><b>Question 2:</b> Why do the gray dots disappear when we look at the intersections directly?</li>
+                            </ul>
+                            <p>
+                                This is easier to answer. Since our <span class="emphasize"><u>receptive fields</u></span> become smaller as we go closer to the fovea in our retina, 
+                                when we center our vision, the <span class="emphasize"><u>receptive fields</u></span> actually don't cover a lot of area (Figure 4.4). 
+                                As a result, the <span class="emphasize rgc-color"><u>RGCs</u></span> are all under spontaneous activity.
+                                <br><br><br>
+
+                                <b>4.2 The Mach Bands</b>
+                                <br><br>
+
+                                Mach bands is an optical illusion named after the physicist Ernst Mach. 
+                                It exaggerates the contrast between edges of the slightly differing shades of gray, 
+                                as soon as they contact one another, by triggering <span class="emphasize"><u>edge detection</u></span> in the our visual system (Figure 4.5).
+                                <br><br>
+
+                                Figure 4.6 describes a common Mach band illusion, where an illusory "X" appears in the large image to the right.
+                            </p>
+                            <ul class="eye-anatomy" style="font-size: 20px;">
+                                <li><b>Question 1:</b> Why is there an illusory "X" in the large image?</li>
+                            </ul>
+                            <p>
+                                Let's zoom up to the corner of the gradients and compare <span class="emphasize"><u>receptive fields</u></span> as usual (Figure 4.7). 
+                                Observe <span class="emphasize"><u>receptive fields</u></span> 5 and 6 and assume ON-center <span class="emphasize rgc-color"><u>RGC</u></span> circuits.
+                            </p>
+                            <ul class="eye-anatomy">
+                                <li><b>RF5:</b> There is an excited center <span class="emphasize"><u>RF</u></span> and a relatively less excited surround <span class="emphasize"><u>RF</u></span>. As a result, there will be less <span class="emphasize"><u>lateral inhibition</u></span>, leading to a <span class="emphasize dep-color"><u>more depolarized</u></span> <span class="emphasize rgc-color"><u>RGC</u></span>.</li>
+                                <li><b>RF6:</b> There is an excited center <span class="emphasize"><u>RF</u></span> and a relatively more excited surround <span class="emphasize"><u>RF</u></span>. As a result, there will be more <span class="emphasize"><u>lateral inhibition</u></span>, leading to a <span class="emphasize hyp-color"><u>less depolarized</u></span> <span class="emphasize rgc-color"><u>RGC</u></span>.</li>
+                            </ul>
+                            <table border="1" cellspacing="0" cellpadding="8">
+                                <thead>
+                                    <tr>
+                                        <th>RF</th>
+                                        <th>Center RF Rods</th>
+                                        <th>Surround RF Rods</th>
+                                        <th class="emphasize">Lateral Inhibition</th>
+                                        <th class="emphasize rgc-color">RGC</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><i>RF 5</i></td>
+                                        <td>Excited</td>
+                                        <td>Less Excited</td>
+                                        <td>Less</td>
+                                        <td class="emphasize dep-color">More Depolarized</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i>RF 6</i></td>
+                                        <td>Excited</td>
+                                        <td>More Excited</td>
+                                        <td>More</td>
+                                        <td class="emphasize hyp-color">Less Depolarized</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p>
+                                Since RF5 has less <span class="emphasize"><u>lateral inhibition</u></span> than RF6, RF5 will present a slightly lighter shade compared to RF6, giving the intersection a faint white gradient compared to the gray background.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="spacer">
+            <div class="divider"></div>
+        </div>
+
+        <div class="epilogue">
+            <p style="font-size: 16px; width: 700px;">
+                This page is created as a supplementary material for Project MEEP. 
+                There are many other retinal properties not explained in this page, such as 
+                direction selectivity, color perception, and the visual pathways.
+                This page is published under the MIT license.
+                <br><br>
+
+                To learn more about Project MEEP, click
+                <a href="https://yfmeep.com" target="_blank" rel="noopener noreferrer">here</a>
+                <br>
+
+                To access the repo, click
+                <a href="https://github.com/yfa2nw/retina-edge-detection" target="_blank" rel="noopener noreferrer">here</a>
+                <br>
+
+                To download the pdf file of a poster that serves as the backbone of this page, click
+                <a href="Retina Model (Tabloid).pdf" target="_blank" rel="noopener noreferrer">here</a> 
+                (made in canva.com, own work)
+                <br>
+            </p>
+        </div>
+
+
+        <!-- SCREWING AROUND -->
+        <!-- the svg lines from 2d simulation
+         will connect to them, just delete this part
+         it's fine-->
+        
+
+        <!-- Script starts here -->
+        <script src="retina.js"></script>
+    </body>
+</html>

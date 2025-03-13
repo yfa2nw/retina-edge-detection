@@ -1,0 +1,500 @@
+body {
+    font-family: 'Roboto Condensed', sans-serif;
+    background-color: #f4f4f4;
+    margin: 20px;
+}
+
+
+/* Website title and things */
+.website-title {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 50px 0 20px 0;
+}
+.help-icon {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 32px;
+    font-weight: bold;
+    border: 3px solid #333;
+    border-radius: 50%;
+    margin: 0 20px;
+    transition: 0.2s;
+}
+.help-icon:hover {
+    scale: 1.2;
+    background-color: #333;
+    color: #f4f4f4;
+    cursor: pointer;
+}
+
+
+/* Simulation section */
+.simulation {
+    display: flex;
+    flex-direction: row;
+    justify-content: safe center;
+}
+
+.simulation-type { /* simulation buttons */
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    justify-content: space-between;
+}
+
+.simulation-button {
+    font-size: 20px;
+    padding: 12px 20px;
+    width: 220px;
+    transition: 0.3s;
+    cursor: pointer;
+    overflow: hidden;
+    border: 2px solid #333;
+    border-radius: 15px;
+}
+
+.simulation-button:hover {
+    scale: 1.2;
+}
+
+#center-response-simulation:hover {
+    background-color: #FF6666;
+}
+#surround-response-simulation:hover {
+    background-color: #FFB266;
+}
+#both-response-simulation:hover {
+    background-color: #87CEEB;
+}
+#neither-response-simulation:hover {
+    background-color: #98FB98;
+}
+#custom-response-simulation:hover {
+    background-color: #8FBC8F;
+}
+
+#radiusSlider {
+    margin: 20px;
+    display: none; /* changing the size of the circle does not correspond correctly to cells */
+}
+
+/* Receptive field simulation */
+.simulation-supercontainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.simulation-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.subheading {
+    display: flex;
+    align-self: center;
+    font-size: 20px;
+    margin: 20px;
+}
+
+.boundary {
+    width: 300px;
+    height: 300px;
+    background-color: lightgray;
+    position: relative;
+    margin: 20px;
+    border: 2px solid #333;
+}
+
+.grid-svg { /* the polar-based grid for record purposes */
+    width: 240px;
+    height: 240px;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+}
+
+.circle {
+    border-radius: 50%;
+}
+
+#surround-area { /* visualizing the receptive field */
+    width: 240px;
+    height: 240px;
+    background-color: #333;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+}
+
+#center-area {
+    width: 80px;
+    height: 80px;
+    background-color: #333;
+    position: absolute;
+    top: 109px;
+    left: 109px;
+    border: 2px solid #f4f4f4;
+}
+
+#draggable-circle {
+    width: var(--block-size);
+    height: var(--block-size);
+    background-color: white;
+    position: absolute;
+    top: var(--center-position);
+    left: var(--center-position);
+    cursor: grab;
+}
+
+
+/* 2d simulation container */
+.cross-boundary {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 300px;
+    height: 300px;
+    background-color: lightgray;
+    position: relative;
+    margin: 20px;
+    border: 2px solid #333;
+}
+
+.rod-container,
+.hc-container,
+.bpc-container,
+.rgc-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin: 10px;
+}
+
+.surround-rod-container,
+.center-rod-container {
+    display: flex;
+    flex-direction: row;
+    width: 90px;
+    justify-content: space-evenly;
+}
+
+/* Common styles for the cells in the retina */
+.surround-rod,
+.center-rod, 
+.rcone, 
+.gcone, 
+.bcone, 
+.hc, 
+.bpc, 
+.offbpc, 
+.rgc, 
+.ac {
+    display: block;
+    border: 1px solid #333;
+}
+
+.surround-rod, .center-rod, .rcone, .gcone, .bcone { /* Rods and Cones */
+    height: 50px;
+    width: 10px;
+    border-radius: 5px;
+}
+
+.surround-rod, .center-rod {background-color: #1E3A5F;}
+
+.rcone {background-color: #E63946;}
+.gcone {background-color: #5EC93D;}
+.bcone {background-color: #3D91C9;}
+
+.hc, .ac { /* Horizontal and Amacrine Cells */
+    height: 20px;
+    width: 50px;
+    border-radius: 10px;
+}
+
+.hc {background-color: #F28500;}
+.ac {background-color: #00A6A6;}
+
+.bpc, .offbpc, .rgc { /* Bipolar and Retinal Ganglion Cells */
+    height: 50px;
+    width: 25px;
+    border-radius: 25px;
+}
+
+.bpc {background-color: #FFD700;}
+.offbpc {background-color: #800080;}
+.rgc {background-color: #B22222;}
+
+
+.svg-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 300px;
+    width: 300px;
+    pointer-events: none; /* Prevent interference with interactions */
+}
+
+.label-container {
+    margin: 20px;
+}
+
+.spacer1 {height: 100px;}
+.spacer2 {height: 45px;}
+.spacer3 {height: 45px;}
+.spacer4 {height: 65px;}
+
+/* The scale at the bottom of the simulation containers */
+.legend-container {
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 20px 0;
+}
+
+.scale-label-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.color-scale {
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(to right, blue, #808080, yellow);
+}
+
+/* spacers and dividers between sections */
+
+.spacer {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: safe center;
+    flex-direction: column;
+}
+
+.divider {
+    width: 500px;
+    height: 5px;
+    background-color: #333;
+    border-radius: 2px;
+}
+
+
+/* text-based lecture with diagrams */
+.lecture-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    align-items: safe center;
+}
+
+h2 {
+    width: fit-content;
+    margin: 20px;
+}
+
+.button-supercontainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+}
+
+.buttons {
+    display: block;
+    width: 380px;
+    padding: 10px;
+    margin: 2px;
+    font-size: 20px;
+    transition: 0.3s;
+}
+
+#anatomy-button:hover,
+#biochem-button:hover,
+#rf-button:hover,
+#vis-button:hover {
+    scale: 1.1;
+    background-color: #333;
+    color: #f4f4f4;
+    cursor: pointer;
+}
+
+.lecture {
+    width: 1200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.lecture-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 20px;
+}
+
+.lecture-supercontainer {
+    flex-direction: column;
+}
+
+#lecture1-supercontainer {
+    display: flex;
+    animation: appear 0.5s;
+}
+#lecture2-supercontainer,
+#lecture3-supercontainer,
+#lecture4-supercontainer {
+    display: none;
+    animation: appear 0.5s;
+}
+
+@keyframes appear {
+    0% {opacity: 0;};
+    100% {opacity: 1;};
+}
+
+#lecture1-container,
+#lecture2-container,
+#lecture3-container,
+#lecture4-container,
+#lecture5-container {
+    display: flex;
+    flex-direction: row;
+}
+
+p {font-size: 20px; line-height: 1.5;}
+img {margin: 20px;}
+.emphasize {
+    transition: 0.3s;
+}
+.emphasize:hover {
+    background-color: #333;
+    color: #f4f4f4;
+    cursor: default;
+}
+
+.lecture-text-container {
+    width: 700px;
+    margin: 20px;
+    height: 500px;
+    overflow-y: auto;
+}
+
+.lecture-diagram-container {
+    width: 500px;
+    margin: 20px;
+    height: 500px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: lightgray;
+}
+
+.image-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.caption {font-weight: bold; margin: 10px 0 50px 0;}
+
+.list {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.indented-list {
+    width: 450px;
+}
+
+.bullet {
+    font-weight: bold;
+    color: #333;
+    display: inline-block;
+    width: 3em; /* Adjust spacing */
+}
+
+.bullet-plus {
+    font-weight: bold;
+    color: #333;
+    display: inline-block;
+    width: 6em; /* Adjust spacing */
+}
+
+.eye-anatomy {
+    line-height: 1.5;
+}
+
+.small-vertical-scale {
+    width: 20px;
+    background: linear-gradient(to bottom, blue, #808080, yellow);
+}
+
+.small-horizontal-rgb-scale {
+    display: flex;
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(to right, #E63946, #5EC93D, #3D91C9);
+}
+
+.small-horizontal-bw-scale {
+    display: flex;
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(to right, #333, #f4f4f4);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+
+/* SCREWING AROUND */
+.screwing-around {
+    display: flex;
+    flex-direction: row;
+}
+
+
+/* COLORS */
+.rod-color:hover {background-color: #1E3A5F;}
+
+.cone-color:hover {background: linear-gradient(to right, #E63946, #5EC93D, #3D91C9);}
+.rcone-color:hover {background-color: #E63946;}
+.gcone-color:hover {background-color: #5EC93D;}
+.bcone-color:hover {background-color: #3D91C9;}
+
+.hc-color:hover {background-color: #F28500;}
+.ac-color:hover {background-color: #00A6A6;}
+
+.bpc-color:hover {background: linear-gradient(to right, #FFD700, #800080);}
+.onbpc-color:hover {background-color: #FFD700;}
+.offbpc-color:hover {background-color: #800080;}
+.rgc-color:hover {background-color: #B22222;}
+
+.hyp-color:hover {background-color: blue;}
+.spont-color:hover {background-color: #808080;}
+.dep-color:hover {background-color: yellow; color: black;}
+
+
+.epilogue {
+    display: flex;
+    width: 100%;
+    justify-content: safe center;
+}
